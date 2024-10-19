@@ -11,7 +11,7 @@ from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
 app = Flask(__name__)
 
 # Đọc dữ liệu lương và số năm kinh nghiệm
-salary = pd.read_csv('D:\\btl-ai\data.csv')
+salary = pd.read_csv('D:\\BTL-AI-NHOM4\data.csv')
 
 
 #kiểm tra dữ liệu rỗng
@@ -61,9 +61,6 @@ estimators = [
 stacking_model = StackingRegressor(estimators=estimators, final_estimator=LinearRegression())
 stacking_model.fit(X_train_scaled, y_train_scaled.ravel())  # Huấn luyện mô hình Stacking
 
-# Phương pháp Bagging với Linear Regression
-bagging_model = BaggingRegressor(estimator=LinearRegression(), n_estimators=10, random_state=2529)
-bagging_model.fit(X_train, y_train.ravel())  # Huấn luyện Bagging với Linear Regression làm mô hình con
 
 # Tính toán các chỉ số cho tập kiểm thử
 # Neural Network
@@ -96,12 +93,6 @@ mse_stacking = mean_squared_error(y_test, y_pred_stacking)
 r2_stacking = r2_score(y_test, y_pred_stacking)
 mae_stacking = mean_absolute_error(y_test, y_pred_stacking)
 
-# Bagging Regressor 
-y_pred_bagging = bagging_model.predict(X_test)
-
-mse_bagging = mean_squared_error(y_test, y_pred_bagging)
-r2_bagging = r2_score(y_test, y_pred_bagging)
-mae_bagging = mean_absolute_error(y_test, y_pred_bagging)
 
 # Route chính để nhập số năm kinh nghiệm và hiển thị kết quả từ các mô hình
 @app.route('/', methods=["POST", "GET"])
@@ -134,9 +125,7 @@ def hello_world():
                 prediction_stacking = scaler_y.inverse_transform(prediction_scaled_stacking.reshape(-1, 1))
                 output_stacking = prediction_stacking[0][0]
 
-                # Dự đoán từ Bagging với Linear Regression 
-                prediction_bagging = bagging_model.predict(final_features)
-                output_bagging = prediction_bagging[0]
+               
 
                 # Định dạng kết quả từ cả 5 mô hình với MSE, R², MAE, và y_pred (lương dự đoán)
                 result = f'<h3>Kết quả dự đoán cho {input_value} năm kinh nghiệm</h3>' \
@@ -152,9 +141,8 @@ def hello_world():
                          f'<h4>Stacking:</h4>' \
                          f'Predicted Salary: {output_stacking:.2f}<br>' \
                          f'R²: {r2_stacking:.2f}<br>MAE: {mae_stacking:.2f}<br>MSE: {mse_stacking:.2f}<br><br>' \
-                         f'<h4>Bagging with Linear Regression:</h4>' \
-                         f'Predicted Salary: {output_bagging:.2f}<br>' \
-                         f'R²: {r2_bagging:.2f}<br>MAE: {mae_bagging:.2f}<br>MSE: {mse_bagging:.2f}<br>'
+                    
+                        
             except ValueError:
                 result = "Vui lòng nhập một số hợp lệ!"
 
